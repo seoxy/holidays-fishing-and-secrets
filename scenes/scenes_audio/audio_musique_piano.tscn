@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://0r43wjju8ra7"]
+
+[ext_resource type="AudioStream" uid="uid://6ce8w2578uw8" path="res://Sound/Music/peche1song.mp3" id="1_q77bj"]
+
+[sub_resource type="GDScript" id="GDScript_q77bj"]
+resource_name = "AudioMusiquePiano"
+script/source = "extends AudioStreamPlayer
+
+@onready var timer :Timer = %Timer
+
+func _ready() -> void:
+	_set_timer()
+	timer.timeout.connect(_play_music)
+
+# Fonction jouant la musique, connectée au timer.
+func _play_music() :
+	# Choisis un moment où commencer, toutes les 10 secondes.
+	var nbre_aleatoire := randi_range(0, 11)
+	var pas := 10
+	var timecode_aleatoire := nbre_aleatoire * pas 
+	
+	play(timecode_aleatoire)
+	# Au bout de 10 secondes de jeu, s'arrête pour ne pas qu'il commence à jouer le bout suivant.
+	await get_tree().create_timer(10.0).timeout
+	stop()
+
+# Choisis la durée du timer et le lance.
+func _set_timer() :
+	var temps_timer := randf_range(10.0, 15.0)
+	timer.start(temps_timer)
+"
+
+[node name="AudioMusiquePiano" type="AudioStreamPlayer" unique_id=2042740529]
+stream = ExtResource("1_q77bj")
+volume_db = 5.816
+script = SubResource("GDScript_q77bj")
+
+[node name="Timer" type="Timer" parent="." unique_id=649495202]
+unique_name_in_owner = true

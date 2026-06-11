@@ -1,0 +1,323 @@
+[gd_scene format=3 uid="uid://b82sehrvlhby2"]
+
+[ext_resource type="Texture2D" uid="uid://buvtrjvgrwhxo" path="res://Visuals/peche/fishing_bar_outside (2).png" id="1_ynt7c"]
+[ext_resource type="Texture2D" uid="uid://dny7il237fpbv" path="res://Visuals/peche/fishing_bar_inside.png" id="2_t71sy"]
+[ext_resource type="Texture2D" uid="uid://dbsmac28uounl" path="res://Visuals/peche/Fish_stardew_valley.png" id="3_ynt7c"]
+
+[sub_resource type="GDScript" id="GDScript_h5hh0"]
+resource_name = "CanvasPeche"
+script/source = "# S'occupe uniquement d'afficher ou de cacher les divers éléments.
+extends CanvasLayer
+
+func _ready() -> void:
+	$NodePeche.hide()
+	$ControlFinPartie.hide()
+	$ContainerMenu.show()
+
+# Pour entrer dans le jeu de pêche.
+func _on_button_pecher_pressed() -> void:
+	$ContainerMenu.hide()
+	$NodePeche.show()
+
+# Pour afficher \"succès\" ou \"échec\" à la fin de la partie.
+func _on_node_peche_end_party(_result: String, _first_catch: bool) -> void:
+	$NodePeche.hide()
+	$ControlFinPartie.show()
+
+# Pour revenir au menu principal.
+func _on_button_fin_partie_pressed() -> void:
+	# Permet de pouvoir repêcher.
+	Gsignals.player_is_fishing = false
+	queue_free()
+"
+
+[sub_resource type="GDScript" id="GDScript_t71sy"]
+resource_name = "Principal"
+script/source = "extends Node2D
+
+#region Raccourcis de noeuds.
+@onready var timer: Timer = %Timer
+@onready var progress_bar: ProgressBar = %ProgressBar
+#endregion
+
+#region Variables.
+var is_on_bar := false
+var fishing := false
+
+var fish_to_catch :Dictionary
+
+signal begining_party
+signal end_party(result:String, first_catch:bool)
+#endregion
+
+####################################################################################################
+func _process(_delta: float) -> void:
+	if self.is_visible_in_tree() and fishing == false :
+		_start_of_the_game()
+	if fishing :
+		_end_of_the_game()
+
+############################### Fonctions de la partie en cours. ###################################
+# Sert à déterminer si on joue ou pas, afin de lancer le chrono qui fait bouger le poisson
+# et permet d'augmenter le score.
+func _start_of_the_game() :
+	begining_party.emit()
+	fishing = true
+	progress_bar.value = 50
+	_set_fishing()
+	timer.start()
+
+# Choisit aléatoirement un poisson à pêcher dans la liste.
+func _set_fishing() :
+	fish_to_catch = Gfishes.all_fishes.pick_random()
+
+
+# Pour vérifier si le poisson est sur la barre ou pas.
+func _on_area_2d_body_entered(_body: Node2D) -> void:
+	is_on_bar = true
+
+# Pour vérifier si le poisson est sur la barre ou pas.
+func _on_area_2d_body_exited(_body: Node2D) -> void:
+	is_on_bar = false
+
+func _on_timer_timeout() -> void:
+	if is_on_bar :
+		$%ProgressBar.value += 5
+	else :
+		$%ProgressBar.value -= 5
+############################### Fonctions de fin de partie. ########################################
+
+# Ajoute le poisson à l'inventaire du joueur ou pas selon réussite.
+func _end_of_the_game() :
+	# Si le joueur atteint 100, le poisson choisit aléatoirement est ajouté à son inventaire.
+	if $ProgressBar.value == 100 :
+		# Vérifie si le joueur n'a pas déjà le poisson dans son inventaire.
+		if Ginventaire.fishes_catched.find(fish_to_catch) == -1 :
+			Ginventaire.fishes_catched.append(fish_to_catch)
+			print(Ginventaire.fishes_catched)
+			end_party.emit(\"réussite\", true)
+		else : end_party.emit(\"réussite\", false)
+		fishing = false
+		
+	if $ProgressBar.value == 0 :
+		fishing = false
+		end_party.emit(\"échec\", false)
+"
+
+[sub_resource type="GDScript" id="GDScript_8xglc"]
+resource_name = "GrooveJoint"
+script/source = "extends GrooveJoint2D
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_h5hh0"]
+size = Vector2(21, 225)
+
+[sub_resource type="GDScript" id="GDScript_ynt7c"]
+resource_name = "inside_bar"
+script/source = "extends RigidBody2D
+
+var init_position :Vector2 = Vector2(14, 136.0)
+
+func _ready() -> void:
+	# position = init_position
+	pass
+	
+func _input(_event: InputEvent) -> void:
+	if Input.is_action_just_pressed(\"clique_gauche\") :
+		apply_impulse(Vector2(0, -300))
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ynt7c"]
+size = Vector2(13, 60)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t71sy"]
+atlas = ExtResource("3_ynt7c")
+region = Rect2(209, 0, 23, 23)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_isj87"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t71sy")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="GDScript" id="GDScript_isj87"]
+resource_name = "fish"
+script/source = "# S'occupe uniquement de bouger le poisson, rien d'autre.
+extends AnimatedSprite2D
+
+var move_distance := 50
+var move_time := 0.6
+
+var init_position :Vector2 = Vector2(-3.0, 101.0)
+
+func _on_timer_timeout() -> void:
+	var direction := randi_range(-1, 1)
+	var target_position := position
+	
+	target_position.y += direction * move_distance
+	
+	if direction != 0 :
+		var tween := create_tween()
+		tween.tween_property(self, \"position\", clamp(target_position, Vector2(-3, -90), Vector2(-3, 90)), move_time)
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_isj87"]
+size = Vector2(11.5, 14)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h5hh0"]
+bg_color = Color(0.231233, 0.8129574, 1.92523e-06, 1)
+
+[sub_resource type="GDScript" id="GDScript_y5cj3"]
+resource_name = "ControlFinpartie"
+script/source = "extends Control
+
+
+func _on_node_peche_end_party(result: String, first_catch: bool) -> void:
+	if result == \"réussite\" and first_catch == false :
+		$LabelFinPartie.text = \"Succès\"
+	elif result == \"réussite\" and first_catch == true :
+		$LabelFinPartie.text = \"Première prise !\"
+	else :
+		$LabelFinPartie.text = \"Echec...\"
+"
+
+[node name="Peche" type="CanvasLayer" unique_id=824769962]
+layer = 150
+script = SubResource("GDScript_h5hh0")
+
+[node name="NodePeche" type="Node2D" parent="." unique_id=760355659]
+position = Vector2(300, 150)
+script = SubResource("GDScript_t71sy")
+
+[node name="SpriteOutside" type="Sprite2D" parent="NodePeche" unique_id=474112809]
+texture = ExtResource("1_ynt7c")
+
+[node name="GrooveJoint2D" type="GrooveJoint2D" parent="NodePeche/SpriteOutside" unique_id=269841740]
+position = Vector2(0, -54.149994)
+node_a = NodePath("StaticBody2D")
+node_b = NodePath("BodyInside")
+length = 161.0
+initial_offset = 163.0
+script = SubResource("GDScript_8xglc")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="NodePeche/SpriteOutside/GrooveJoint2D" unique_id=711717256]
+position = Vector2(0, 54.149994)
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NodePeche/SpriteOutside/GrooveJoint2D/StaticBody2D" unique_id=115312033]
+shape = SubResource("RectangleShape2D_h5hh0")
+debug_color = Color(0.7121442, 0.33457687, 0.88281995, 0.41960785)
+
+[node name="BodyInside" type="RigidBody2D" parent="NodePeche/SpriteOutside/GrooveJoint2D" unique_id=1286955068]
+position = Vector2(0, 136)
+collision_layer = 2
+collision_mask = 2
+lock_rotation = true
+linear_damp = 2.0
+angular_damp = 10.0
+script = SubResource("GDScript_ynt7c")
+
+[node name="SpriteInside" type="Sprite2D" parent="NodePeche/SpriteOutside/GrooveJoint2D/BodyInside" unique_id=314334959]
+texture = ExtResource("2_t71sy")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NodePeche/SpriteOutside/GrooveJoint2D/BodyInside" unique_id=506781555]
+shape = SubResource("RectangleShape2D_ynt7c")
+
+[node name="Fish" type="AnimatedSprite2D" parent="NodePeche" unique_id=851035963]
+position = Vector2(-3.0000057, 100.99999)
+scale = Vector2(0.86666745, 1)
+sprite_frames = SubResource("SpriteFrames_isj87")
+script = SubResource("GDScript_isj87")
+
+[node name="Area2D" type="Area2D" parent="NodePeche/Fish" unique_id=31668722]
+position = Vector2(3.4615352, 1.9999999)
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NodePeche/Fish/Area2D" unique_id=302695606]
+position = Vector2(-0.25, 0)
+shape = SubResource("RectangleShape2D_isj87")
+
+[node name="ProgressBar" type="ProgressBar" parent="NodePeche" unique_id=1549867852]
+unique_name_in_owner = true
+offset_left = 23.0
+offset_top = -112.0
+offset_right = 50.0
+offset_bottom = 112.0
+theme_override_styles/fill = SubResource("StyleBoxFlat_h5hh0")
+value = 50.0
+fill_mode = 3
+
+[node name="Timer" type="Timer" parent="NodePeche" unique_id=1619630529]
+unique_name_in_owner = true
+wait_time = 0.2
+
+[node name="ContainerMenu" type="HBoxContainer" parent="." unique_id=1407866101]
+visible = false
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -15.5
+offset_bottom = 15.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="ButtonPecher" type="Button" parent="ContainerMenu" unique_id=2009136985]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+text = "Pêcher"
+
+[node name="ControlFinPartie" type="Control" parent="." unique_id=101993626]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_y5cj3")
+metadata/_edit_lock_ = true
+
+[node name="LabelFinPartie" type="Label" parent="ControlFinPartie" unique_id=1620244465]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -11.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Lorem Ipsum !"
+horizontal_alignment = 1
+
+[node name="ButtonFinPartie" type="Button" parent="ControlFinPartie" unique_id=1086010074]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.8038194
+anchor_top = 0.8518519
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Retour au jeu"
+metadata/_edit_use_anchors_ = true
+
+[connection signal="begining_party" from="NodePeche" to="NodePeche/Fish" method="_on_node_peche_begining_party"]
+[connection signal="end_party" from="NodePeche" to="." method="_on_node_peche_end_party"]
+[connection signal="end_party" from="NodePeche" to="ControlFinPartie" method="_on_node_peche_end_party"]
+[connection signal="body_entered" from="NodePeche/Fish/Area2D" to="NodePeche" method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="NodePeche/Fish/Area2D" to="NodePeche" method="_on_area_2d_body_exited"]
+[connection signal="timeout" from="NodePeche/Timer" to="NodePeche" method="_on_timer_timeout"]
+[connection signal="timeout" from="NodePeche/Timer" to="NodePeche/Fish" method="_on_timer_timeout"]
+[connection signal="pressed" from="ContainerMenu/ButtonPecher" to="." method="_on_button_pecher_pressed"]
+[connection signal="pressed" from="ControlFinPartie/ButtonFinPartie" to="." method="_on_button_fin_partie_pressed"]

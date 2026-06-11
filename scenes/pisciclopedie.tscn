@@ -1,0 +1,211 @@
+[gd_scene format=3 uid="uid://du0pbeufwnb6l"]
+
+[ext_resource type="LabelSettings" uid="uid://dvqdt5bjp2c35" path="res://ressources/label_settings/pisciclopedie.tres" id="1_1wf0a"]
+[ext_resource type="Shortcut" uid="uid://cn0vg4pw1naqs" path="res://ressources/shortcuts/p.tres" id="2_jx2xs"]
+
+[sub_resource type="GDScript" id="GDScript_e57f8"]
+resource_name = "ControlPisciclopedie"
+script/source = "extends Control
+
+@onready var label_nom_donnee :Label = $PanelPisciclopedie/GridInfosGen/LabelNomdonnee
+@onready var label_familledonnee: Label = %LabelFamilledonnee
+@onready var label_description: Label = %LabelDescription
+@onready var label_habitat: Label = %LabelHabitat
+@onready var label_index: Label = $PanelPisciclopedie/LabelIndex
+
+var fish_to_show :int = 0
+#####################################################################
+func _ready() -> void:
+	_remplissage_des_champs()
+
+# Fonction prenant un dictionnaire de l'inventaire et l'affichant.
+func _remplissage_des_champs() :
+	if Ginventaire.fishes_catched.is_empty() :
+		return
+	else :
+		label_nom_donnee.text = Ginventaire.fishes_catched[fish_to_show][\"name\"]
+		label_familledonnee.text = Ginventaire.fishes_catched[fish_to_show][\"family\"]
+		label_description.text = \"Description : \" + Ginventaire.fishes_catched[fish_to_show][\"description\"]
+		label_habitat.text = \"Habitat : \" + Ginventaire.fishes_catched[fish_to_show][\"habitat\"]
+		label_index.text = Ginventaire.fishes_catched[fish_to_show][\"index\"] + \" / 5\"
+
+func _on_button_precedent_pressed() -> void:
+	if fish_to_show > 0 :
+		fish_to_show -= 1
+	_remplissage_des_champs()
+
+func _on_button_suivant_pressed() -> void:
+	if Ginventaire.fishes_catched.size() > fish_to_show + 1 :
+		fish_to_show += 1
+	_remplissage_des_champs()
+
+# Supprime cette scène.
+func _on_button_quitter_pressed() -> void:
+	get_tree().paused = false
+	hide()
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_isj87"]
+bg_color = Color(0, 0.34509805, 0.3529412, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 9
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_t71sy"]
+load_path = "res://.godot/imported/tanche.jpg-b463996194c7bb4b60b6e76340b4bc05.ctex"
+
+[sub_resource type="LabelSettings" id="LabelSettings_isj87"]
+font_size = 9
+
+[node name="ControlPisciclopedie" type="Control" unique_id=933212117]
+process_mode = 2
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_e57f8")
+metadata/_edit_lock_ = true
+
+[node name="PanelPisciclopedie" type="Panel" parent="." unique_id=852450544]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -137.0
+offset_top = -129.0
+offset_right = 136.0
+offset_bottom = 129.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_isj87")
+metadata/_edit_lock_ = true
+
+[node name="TextImagePoisson" type="TextureRect" parent="PanelPisciclopedie" unique_id=120986752]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_left = 0.04029304
+anchor_top = 0.023255814
+anchor_right = 0.35897437
+anchor_bottom = 0.39534885
+texture = SubResource("CompressedTexture2D_t71sy")
+expand_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="GridInfosGen" type="GridContainer" parent="PanelPisciclopedie" unique_id=1989255017]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3809524
+anchor_top = 0.07751938
+anchor_right = 0.974359
+anchor_bottom = 0.36821705
+grow_horizontal = 0
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 14
+columns = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="LabelNom" type="Label" parent="PanelPisciclopedie/GridInfosGen" unique_id=83997832]
+layout_mode = 2
+text = "Nom :"
+label_settings = ExtResource("1_1wf0a")
+
+[node name="LabelNomdonnee" type="Label" parent="PanelPisciclopedie/GridInfosGen" unique_id=1315922280]
+unique_name_in_owner = true
+layout_mode = 2
+text = "????"
+label_settings = ExtResource("1_1wf0a")
+
+[node name="LabelFamille" type="Label" parent="PanelPisciclopedie/GridInfosGen" unique_id=512421345]
+layout_mode = 2
+text = "Famille : "
+label_settings = ExtResource("1_1wf0a")
+
+[node name="LabelFamilledonnee" type="Label" parent="PanelPisciclopedie/GridInfosGen" unique_id=2128563173]
+unique_name_in_owner = true
+layout_mode = 2
+text = "????"
+label_settings = ExtResource("1_1wf0a")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelPisciclopedie" unique_id=1260471706]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05860806
+anchor_top = 0.39922482
+anchor_right = 0.93040293
+anchor_bottom = 0.87984496
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 14
+metadata/_edit_use_anchors_ = true
+
+[node name="LabelDescription" type="Label" parent="PanelPisciclopedie/VBoxContainer" unique_id=266836787]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(15, 15)
+layout_mode = 2
+text = "Description : ????"
+label_settings = SubResource("LabelSettings_isj87")
+autowrap_mode = 3
+
+[node name="LabelHabitat" type="Label" parent="PanelPisciclopedie/VBoxContainer" unique_id=424500337]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(15, 15)
+layout_mode = 2
+text = "Habitat : ????"
+label_settings = SubResource("LabelSettings_isj87")
+autowrap_mode = 3
+
+[node name="ButtonSuivant" type="Button" parent="PanelPisciclopedie" unique_id=2089330200]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.6923077
+anchor_top = 0.87984496
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Suivant"
+metadata/_edit_use_anchors_ = true
+
+[node name="ButtonPrecedent" type="Button" parent="PanelPisciclopedie" unique_id=1513568160]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.87984496
+anchor_right = 0.31868133
+anchor_bottom = 1.0
+grow_vertical = 0
+text = "Précédent"
+metadata/_edit_use_anchors_ = true
+
+[node name="ButtonQuitter" type="Button" parent="PanelPisciclopedie" unique_id=2144245858]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.92673993
+anchor_right = 1.0
+anchor_bottom = 0.12015504
+grow_horizontal = 0
+shortcut = ExtResource("2_jx2xs")
+text = "X"
+metadata/_edit_use_anchors_ = true
+
+[node name="LabelIndex" type="Label" parent="PanelPisciclopedie" unique_id=272483041]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.42673993
+anchor_top = 0.91085273
+anchor_right = 0.57326007
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "0 / 5"
+horizontal_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[connection signal="pressed" from="PanelPisciclopedie/ButtonSuivant" to="." method="_on_button_suivant_pressed"]
+[connection signal="pressed" from="PanelPisciclopedie/ButtonPrecedent" to="." method="_on_button_precedent_pressed"]
+[connection signal="pressed" from="PanelPisciclopedie/ButtonQuitter" to="." method="_on_button_quitter_pressed"]

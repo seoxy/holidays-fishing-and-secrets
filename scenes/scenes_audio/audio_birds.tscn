@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://begx8gdugayqv"]
+
+[ext_resource type="AudioStream" uid="uid://xy2gnpi6nsbb" path="res://Sound/SFX/oiseauxsfx.mp3" id="1_kd1wp"]
+
+[sub_resource type="GDScript" id="GDScript_g0mit"]
+resource_name = "AudioBirds"
+script/source = "extends AudioStreamPlayer
+
+@onready var timer :Timer = %Timer
+
+# ###############################
+func _ready() -> void:
+	_set_and_launch_timer()
+	timer.timeout.connect(_play_sound_or_not)
+
+# ###############################
+
+# Choisis la durée du timer et le lance.
+func _set_and_launch_timer() :
+	var temps_timer := randf_range(0.5, 2.0)
+	timer.start(temps_timer)
+
+func _play_sound_or_not() :
+	_set_and_launch_timer()
+	if randf_range(0.0, 1.0) < 0.2 :
+		_play_bird_sound()
+
+# Fonction jouant le chant de l'oiseau, connecté au timer.
+func _play_bird_sound() :
+	# Choisis un moment où commencer, toutes les 5 secondes.
+	var nbre_aleatoire := randi_range(0, 5)
+	var pas := 5
+	var timecode_aleatoire := nbre_aleatoire * pas 
+	
+	play(timecode_aleatoire)
+	# Au bout de 5 secondes de jeu, s'arrête pour ne pas qu'il commence à jouer le bout suivant.
+	await get_tree().create_timer(5.0).timeout
+	stop()
+"
+
+[node name="AudioBirds" type="AudioStreamPlayer" unique_id=1407063877]
+stream = ExtResource("1_kd1wp")
+max_polyphony = 5
+script = SubResource("GDScript_g0mit")
+
+[node name="Timer" type="Timer" parent="." unique_id=1130378191]
+unique_name_in_owner = true
+one_shot = true

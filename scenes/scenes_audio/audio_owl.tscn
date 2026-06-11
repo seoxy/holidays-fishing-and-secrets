@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://dektlqij33iqn"]
+
+[ext_resource type="AudioStream" uid="uid://c8dtd277b706y" path="res://Sound/SFX/owl-sfx.wav" id="1_1hgsr"]
+
+[node name="AudioOwl" type="AudioStreamPlayer" unique_id=2027419848]
+stream = ExtResource("1_1hgsr")
+volume_db = -7.027

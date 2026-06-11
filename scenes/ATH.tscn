@@ -1,0 +1,167 @@
+[gd_scene format=3 uid="uid://dbjdn0eee1f8g"]
+
+[ext_resource type="PackedScene" uid="uid://du0pbeufwnb6l" path="res://scenes/pisciclopedie.tscn" id="1_qf8ov"]
+[ext_resource type="Shortcut" uid="uid://cn0vg4pw1naqs" path="res://ressources/shortcuts/p.tres" id="1_twrn0"]
+
+[sub_resource type="GDScript" id="GDScript_2gnp0"]
+resource_name = "PanelTemps"
+script/source = "extends Panel
+
+@onready var label_temps : Label = $LabelTemps
+
+func _process(_delta: float) -> void:
+	_actualiser_label()
+
+# Permet de voir l'heure en temps réel.
+func _actualiser_label() :
+	label_temps.text = str(Gheure.heures) + \" : \" + str(Gheure.minutes)
+"
+
+[sub_resource type="GDScript" id="GDScript_twrn0"]
+resource_name = "PanelMeteo"
+script/source = "extends Panel
+
+@onready var label_meteo: Label = $LabelMeteo
+
+func _process(delta: float) -> void:
+	_actualiser_label()
+
+func _actualiser_label() :
+	label_meteo.text = Gheure.meteo
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_k0juu"]
+font_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2gnp0"]
+bg_color = Color(0.16470589, 0, 0.7254902, 0.48235294)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_twrn0"]
+bg_color = Color(0.16470589, 0, 0.7254902, 0.48235294)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qf8ov"]
+bg_color = Color(0.5529412, 0, 0.7254902, 0.8509804)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="GDScript" id="GDScript_qf8ov"]
+resource_name = "ButtonPisciclopedie"
+script/source = "extends Button
+
+@onready var control_pisciclopedie: Control = $\"../../ControlPisciclopedie\"
+
+
+# Si on presse le bouton P, cela affiche la pisciclopedie.
+func _on_pressed() -> void:
+	control_pisciclopedie.show()
+	
+	# Met en pause tout le jeu.
+	get_tree().paused = true
+"
+
+[node name="ATH" type="CanvasLayer" unique_id=1526403270]
+layer = 100
+
+[node name="ControlATH" type="Control" parent="." unique_id=938500565]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="PanelTemps" type="Panel" parent="ControlATH" unique_id=1534222898]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.88000005
+anchor_right = 1.0
+anchor_bottom = 0.117000006
+offset_left = 4.1199646
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = -5.908001
+grow_horizontal = 0
+script = SubResource("GDScript_2gnp0")
+metadata/_edit_group_ = true
+
+[node name="LabelTemps" type="Label" parent="ControlATH/PanelTemps" unique_id=467488763]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "17 : 30"
+horizontal_alignment = 1
+
+[node name="PanelMeteo" type="Panel" parent="ControlATH" unique_id=1137491612]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.89800006
+anchor_top = 0.102000006
+anchor_right = 1.0
+anchor_bottom = 0.15100001
+offset_left = 3.7519531
+offset_top = 0.95199966
+offset_right = -6.0
+offset_bottom = 1.0759964
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_twrn0")
+metadata/_edit_group_ = true
+
+[node name="LabelMeteo" type="Label" parent="ControlATH/PanelMeteo" unique_id=509023316]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Dégagé"
+label_settings = SubResource("LabelSettings_k0juu")
+horizontal_alignment = 1
+vertical_alignment = 1
+visible_characters = 6
+
+[node name="ButtonPisciclopedie" type="Button" parent="ControlATH" unique_id=538941219]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.9409722
+anchor_top = 0.16666667
+anchor_right = 0.9878472
+anchor_bottom = 0.25
+grow_horizontal = 0
+tooltip_text = "Pisciclopedie (P)"
+theme_override_styles/normal = SubResource("StyleBoxFlat_2gnp0")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_twrn0")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qf8ov")
+shortcut = ExtResource("1_twrn0")
+shortcut_in_tooltip = false
+text = "P"
+script = SubResource("GDScript_qf8ov")
+metadata/_edit_use_anchors_ = true
+
+[node name="ControlPisciclopedie" parent="." unique_id=933212117 instance=ExtResource("1_qf8ov")]
+visible = false
+
+[connection signal="pressed" from="ControlATH/ButtonPisciclopedie" to="ControlATH/ButtonPisciclopedie" method="_on_pressed"]
