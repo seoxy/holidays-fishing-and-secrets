@@ -10,8 +10,9 @@ script/source = "extends Control
 @onready var label_nom_donnee :Label = $PanelPisciclopedie/GridInfosGen/LabelNomdonnee
 @onready var label_familledonnee: Label = %LabelFamilledonnee
 @onready var label_description: Label = %LabelDescription
-@onready var label_habitat: Label = %LabelHabitat
+@onready var label_capture: Label = %LabelHabitat
 @onready var label_index: Label = $PanelPisciclopedie/LabelIndex
+@onready var texture_poisson: TextureRect = %TextImagePoisson
 
 var fish_to_show :int = 0
 #####################################################################
@@ -26,9 +27,11 @@ func _remplissage_des_champs() :
 		label_nom_donnee.text = Ginventaire.fishes_catched[fish_to_show][\"name\"]
 		label_familledonnee.text = Ginventaire.fishes_catched[fish_to_show][\"family\"]
 		label_description.text = \"Description : \" + Ginventaire.fishes_catched[fish_to_show][\"description\"]
-		label_habitat.text = \"Habitat : \" + Ginventaire.fishes_catched[fish_to_show][\"habitat\"]
+		label_capture.text = \"Capture : \" + Ginventaire.fishes_catched[fish_to_show][\"capture\"]
 		label_index.text = Ginventaire.fishes_catched[fish_to_show][\"index\"] + \" / 5\"
-
+		texture_poisson.texture = Ginventaire.fishes_catched[fish_to_show][\"texture\"]
+		
+		
 func _on_button_precedent_pressed() -> void:
 	if fish_to_show > 0 :
 		fish_to_show -= 1
@@ -156,7 +159,7 @@ autowrap_mode = 3
 unique_name_in_owner = true
 custom_minimum_size = Vector2(15, 15)
 layout_mode = 2
-text = "Habitat : ????"
+text = "Capture : ????"
 label_settings = SubResource("LabelSettings_isj87")
 autowrap_mode = 3
 
