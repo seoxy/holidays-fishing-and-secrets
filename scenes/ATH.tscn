@@ -7,12 +7,12 @@
 resource_name = "PanelTemps"
 script/source = "extends Panel
 
-@onready var label_temps : Label = $LabelTemps
+@onready var label_temps: Label = %LabelTemps
 
 func _process(_delta: float) -> void:
 	_actualiser_label()
 
-# Permet de voir l'heure en temps réel.
+# Permet de voir l'indicateur de l'heure en haut à droite.
 func _actualiser_label() :
 	label_temps.text = str(Gheure.heures) + \" : \" + str(Gheure.minutes)
 "
@@ -21,11 +21,12 @@ func _actualiser_label() :
 resource_name = "PanelMeteo"
 script/source = "extends Panel
 
-@onready var label_meteo: Label = $LabelMeteo
+@onready var label_meteo: Label = %LabelMeteo
 
 func _process(delta: float) -> void:
 	_actualiser_label()
 
+# Permet d'actualiser l'indicateur de météo en haut à droite.
 func _actualiser_label() :
 	label_meteo.text = Gheure.meteo
 "
@@ -79,7 +80,7 @@ func _on_pressed() -> void:
 "
 
 [node name="ATH" type="CanvasLayer" unique_id=1526403270]
-layer = 100
+layer = 20
 
 [node name="ControlATH" type="Control" parent="." unique_id=938500565]
 layout_mode = 3
@@ -105,6 +106,7 @@ script = SubResource("GDScript_2gnp0")
 metadata/_edit_group_ = true
 
 [node name="LabelTemps" type="Label" parent="ControlATH/PanelTemps" unique_id=467488763]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -131,6 +133,7 @@ script = SubResource("GDScript_twrn0")
 metadata/_edit_group_ = true
 
 [node name="LabelMeteo" type="Label" parent="ControlATH/PanelMeteo" unique_id=509023316]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

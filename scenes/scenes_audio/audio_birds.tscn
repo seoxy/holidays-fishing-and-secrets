@@ -11,19 +11,20 @@ script/source = "extends AudioStreamPlayer
 # ###############################
 func _ready() -> void:
 	_set_and_launch_timer()
-	timer.timeout.connect(_play_sound_or_not)
+
+	# 20% de chances que le son d'oiseau soit joué quand le timer s'achève.
+	timer.timeout.connect( func _play_sound_or_not() -> void :
+		_set_and_launch_timer()
+		if randf_range(0.0, 1.0) < 0.2 :
+			_play_bird_sound()
+		)
 
 # ###############################
 
-# Choisis la durée du timer et le lance.
+# Choisis aléatoirement la durée du timer et le lance.
 func _set_and_launch_timer() :
 	var temps_timer := randf_range(0.5, 2.0)
 	timer.start(temps_timer)
-
-func _play_sound_or_not() :
-	_set_and_launch_timer()
-	if randf_range(0.0, 1.0) < 0.2 :
-		_play_bird_sound()
 
 # Fonction jouant le chant de l'oiseau, connecté au timer.
 func _play_bird_sound() :
@@ -31,7 +32,7 @@ func _play_bird_sound() :
 	var nbre_aleatoire := randi_range(0, 5)
 	var pas := 5
 	var timecode_aleatoire := nbre_aleatoire * pas 
-	
+
 	play(timecode_aleatoire)
 	# Au bout de 5 secondes de jeu, s'arrête pour ne pas qu'il commence à jouer le bout suivant.
 	await get_tree().create_timer(5.0).timeout

@@ -1,26 +1,27 @@
 extends Node
 
-#region Variables
 var heures :int = 5
 var minutes :int = 40
+var duration_10_minutes :int = 5 # Combien de secondes durent 10 minutes.
+
+#region Variables
 var meteo :String = "Dégagé"
 
 var rained_today :bool = false
+signal stop_rain
+#endregion
 
-var timer_10_sec :Timer
+#region Raccourcis noeuds et scènes.
+var timer_10_minutes :Timer
 var canvas_nuit :CanvasModulate
 var audio_owl :AudioStreamPlayer = preload("res://scenes/scenes_audio/audio_owl.tscn").instantiate()
 var audio_birds :AudioStreamPlayer = preload("res://scenes/scenes_audio/audio_birds.tscn").instantiate()
 var scene_rain :PackedScene = preload("res://scenes/rain.tscn")
-
-signal stop_rain
 #endregion
-
-
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	_reglage_et_lancement_timer(0.5)
+	_reglage_et_lancement_timer(duration_10_minutes)
 
 	canvas_nuit = CanvasModulate.new()
 	add_child(canvas_nuit)
@@ -29,7 +30,7 @@ func _ready() -> void:
 
 # Fonction qui se lance quand le timer envoie son signal.
 # Change les variables de temps.
-func _on_timer_10_sec_timeout() :
+func _on_timer_10_minutes_timeout() :
 	# Avant 23H.
 	if heures < 23 :
 		if minutes < 50 :
@@ -56,17 +57,17 @@ func _on_timer_10_sec_timeout() :
 
 # Instantie le timer et l'ajoute à la scène.
 func _reglage_et_lancement_timer(duree:float) :
-	timer_10_sec = Timer.new()
-	add_child(timer_10_sec)
-	timer_10_sec.autostart = true
-	timer_10_sec.wait_time = duree
+	timer_10_minutes = Timer.new()
+	add_child(timer_10_minutes)
+	timer_10_minutes.autostart = true
+	timer_10_minutes.wait_time = duree
 	# Connecte son timeout avec une fonction.
-	timer_10_sec.timeout.connect(_on_timer_10_sec_timeout)
+	timer_10_minutes.timeout.connect(_on_timer_10_minutes_timeout)
 	# Lance le timer.
-	timer_10_sec.start()
+	timer_10_minutes.start()
 
 
-######################## Nuit : 18h10 à 6h10. ########################
+#region Nuit : 18h10 à 6h10.
 # Filtre progressif changeant la couleur du monde pour le rendre nocturne.
 func _filtre_entrée_nuit() :
 	var tween :Tween = create_tween().set_trans(Tween.TRANS_SINE)
@@ -86,7 +87,9 @@ func _bruit_de_chouette_aléatoire() :
 			pass
 		else :
 			audio_owl.play()
+#endregion
 
+# Lancée une fois par heure.
 func _rain() :
 	# Peut lancer la pluie s'il ne pleut pas.
 	if rained_today == false :
@@ -96,6 +99,7 @@ func _rain() :
 			rained_today = true
 			meteo = "Pluie"
 	elif rained_today == true :
+		# Signal écouté dans le script de rain. Supprime le noeud.
 		stop_rain.emit()
 		meteo = "Dégagé"
 

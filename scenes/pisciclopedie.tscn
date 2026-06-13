@@ -7,6 +7,7 @@
 resource_name = "ControlPisciclopedie"
 script/source = "extends Control
 
+#region Raccourcis de noeuds et variables.
 @onready var label_nom_donnee :Label = $PanelPisciclopedie/GridInfosGen/LabelNomdonnee
 @onready var label_familledonnee: Label = %LabelFamilledonnee
 @onready var label_description: Label = %LabelDescription
@@ -15,7 +16,9 @@ script/source = "extends Control
 @onready var texture_poisson: TextureRect = %TextImagePoisson
 
 var fish_to_show :int = 0
-#####################################################################
+#endregion
+
+
 func _ready() -> void:
 	_remplissage_des_champs()
 
@@ -30,8 +33,8 @@ func _remplissage_des_champs() :
 		label_capture.text = \"Capture : \" + Ginventaire.fishes_catched[fish_to_show][\"capture\"]
 		label_index.text = Ginventaire.fishes_catched[fish_to_show][\"index\"] + \" / 5\"
 		texture_poisson.texture = Ginventaire.fishes_catched[fish_to_show][\"texture\"]
-		
-		
+
+#region Fonctions de boutons.
 func _on_button_precedent_pressed() -> void:
 	if fish_to_show > 0 :
 		fish_to_show -= 1
@@ -46,6 +49,7 @@ func _on_button_suivant_pressed() -> void:
 func _on_button_quitter_pressed() -> void:
 	get_tree().paused = false
 	hide()
+#endregion
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_isj87"]
@@ -62,7 +66,7 @@ load_path = "res://.godot/imported/tanche.jpg-b463996194c7bb4b60b6e76340b4bc05.c
 [sub_resource type="LabelSettings" id="LabelSettings_isj87"]
 font_size = 9
 
-[node name="ControlPisciclopedie" type="Control" unique_id=933212117]
+[node name="Pisciclopedie" type="Control" unique_id=933212117]
 process_mode = 2
 layout_mode = 3
 anchors_preset = 15

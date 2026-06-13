@@ -22,6 +22,7 @@ shader_parameter/colour = Color(0.8047426, 0.80474263, 0.8047426, 1)
 shader_parameter/size = Vector2(0.006, 0.605)
 
 [node name="Rain" type="CanvasLayer" unique_id=1491207405]
+layer = 10
 script = SubResource("GDScript_5mvay")
 
 [node name="ControlRain" type="Control" parent="." unique_id=1555128936]
@@ -32,7 +33,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ColorRect" type="ColorRect" parent="ControlRain" unique_id=290762742]
+[node name="ColorRain" type="ColorRect" parent="ControlRain" unique_id=290762742]
 material = SubResource("ShaderMaterial_k0juu")
 custom_minimum_size = Vector2(23.28, 21.26)
 layout_mode = 0
